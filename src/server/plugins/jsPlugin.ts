@@ -1,14 +1,17 @@
 import Koa from 'koa';
+import { IPlugin } from '../';
 
-export default {
-    config: (app: Koa) => {
-        console.log(app);
+const plugin: IPlugin = {
+    config: ({ app }) => {
+        // console.log('app');
     },
     transforms: {
         test: (path: string) => true,
         transform: (code: string) => {
-            console.log(code);
+            // console.log(code);
             return code;
         }
     },
 };
+
+export default plugin;
