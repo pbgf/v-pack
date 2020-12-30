@@ -2,24 +2,26 @@ import Koa from 'koa';
 import { init, parse } from 'es-module-lexer';
 import MagicString from 'magic-string';
 import { ICorePlugin } from '../';
-import { resolveRelativeRequest } from '../../utils/pathUtil';
+import { resolveRelativeRequest, getPrevPath, bareImportRE } from '../../utils/pathUtil';
 import { readBody } from '../../utils/fsUtil';
 
-const plugin: ICorePlugin = ({ app }) => {
+const plugin: ICorePlugin = ({ app, root }) => {
     app.use(async (ctx, next) => {
-      console.log('init');
+      await next();
       await init;
       const content = await readBody(ctx.body) || '';
-      console.log(content);
+      const magicStr = new MagicString(content);
       const [imports] = parse(content);
       for(let i = 0;i < imports.length;i++) {
         const { s, e } = imports[i];
-        const moduleId = content.substr(s, e);
-        const magicStr = new MagicString(content);
-        magicStr.overwrite(s, e, resolveRelativeRequest(ctx.url, moduleId));
-        ctx.body = magicStr.toString();
+        const moduleId = content.slice(s, e);
+        if (bareImportRE.test(moduleId)) {
+          magicStr.overwrite(s, e, `@modules/${moduleId}`);
+        } else {
+          magicStr.overwrite(s, e, resolveRelativeRequest(getPrevPath(root, ctx.url), moduleId));
+        }
       }
-      await next();
+      ctx.body = magicStr.toString();
     });
 };
 

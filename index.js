@@ -1,5 +1,6 @@
 import runServe from './dist/server/index.js';
+import react from 'react';
 
 let a = {
-  a: 'hah',
+  b: 'hch',
 };

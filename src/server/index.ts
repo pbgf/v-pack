@@ -59,9 +59,9 @@ export const runServe = () => {
     };
     const plugins: IPlugin[] = [jsPlugin];
     const corePlugins: ICorePlugin[] = [
-        staticPlugin,
         moduleRewritePlugin,
         createServerTransformPlugin(plugins),
+        staticPlugin,
     ];
 
     app.use(async (ctx, next) => {
