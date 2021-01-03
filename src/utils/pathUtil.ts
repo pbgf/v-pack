@@ -4,6 +4,7 @@ import fs from 'fs';
 
 //非 . / 开头的模块 都是bareModule
 export const bareImportRE =  /^[^\/\.]/;
+export const moduleRE = /.*@modules.*/;
 export const exts = ['.js', '.jsx'];
 
 export function getFullPath(fuzzyPath: string) {

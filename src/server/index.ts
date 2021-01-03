@@ -7,8 +7,9 @@ import http from 'http';
 import jsPlugin from './plugins/jsPlugin';
 import transformPlugin from './plugins/serverTransformPlugin';
 import moduleRewritePlugin from './plugins/serverModuleRewritePlugin';
+import moduleResolvePlugin from './plugins/serverModuleResolvePlugin';
 import staticPlugin from './plugins/serverStaticPlugin';
-import { cacheRead } from '../utils/fsUtil';
+import { cacheRead, readBody } from '../utils/fsUtil';
 import { requestToFile } from '../utils/pathUtil';
 import { error } from 'console';
 
@@ -41,10 +42,26 @@ export function isFunction(fun: unknown): fun is Function{
 };
 
 function createServerTransformPlugin(plugins: IPlugin[]): ICorePlugin {
+    const transforms: ITransform[] = [];
+    for(const plugin of plugins) {
+        const { transforms: ts } = plugin;
+        if (Array.isArray(ts)) {
+            transforms.push(...ts);
+        } else if (ts) {
+            transforms.push(ts);
+        }
+    }
     return ({ app }) => {
         app.use(async (ctx, next) => {
             await next();
-            const { response } = ctx;
+            const content = await readBody(ctx.body);
+            transforms.forEach(t => {
+                const { test, transform } = t;
+                if (test(ctx.path)) {
+                    transform(content || '');
+                }
+            });
+            ctx.body = content;
         });
     };    
 };
@@ -60,6 +77,7 @@ export const runServe = () => {
     const plugins: IPlugin[] = [jsPlugin];
     const corePlugins: ICorePlugin[] = [
         moduleRewritePlugin,
+        moduleResolvePlugin,
         createServerTransformPlugin(plugins),
         staticPlugin,
     ];

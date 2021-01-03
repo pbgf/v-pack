@@ -10,18 +10,20 @@ const plugin: ICorePlugin = ({ app, root }) => {
       await next();
       await init;
       const content = await readBody(ctx.body) || '';
-      const magicStr = new MagicString(content);
-      const [imports] = parse(content);
-      for(let i = 0;i < imports.length;i++) {
-        const { s, e } = imports[i];
-        const moduleId = content.slice(s, e);
-        if (bareImportRE.test(moduleId)) {
-          magicStr.overwrite(s, e, `@modules/${moduleId}`);
-        } else {
-          magicStr.overwrite(s, e, resolveRelativeRequest(getPrevPath(root, ctx.url), moduleId));
+      if (!ctx.response.is('html')) {
+        const magicStr = new MagicString(content);
+        const [imports] = parse(content);
+        for(let i = 0;i < imports.length;i++) {
+          const { s, e } = imports[i];
+          const moduleId = content.slice(s, e);
+          if (bareImportRE.test(moduleId)) {
+            magicStr.overwrite(s, e, `/@modules/${moduleId}`);
+          } else {
+            magicStr.overwrite(s, e, resolveRelativeRequest(getPrevPath(root, ctx.url), moduleId));
+          }
         }
+        ctx.body = magicStr.toString();
       }
-      ctx.body = magicStr.toString();
     });
 };
 
