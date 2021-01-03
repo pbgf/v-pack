@@ -40,15 +40,19 @@ export function getFullPath(fuzzyPath: string) {
 }
 
 export function getPrevPath(root: string, reqUrl: string) {
-  const fullPath = getFullPath(path.join(root, reqUrl)).split(root)[1];
-  return fullPath.slice(0, fullPath.lastIndexOf('/') + 1);
+  const fullPath = getFullPath(path.posix.join(root, reqUrl)).split(root)[1];
+  return fullPath.slice(0, fullPath.lastIndexOf(path.posix.sep) + 1);
 }
 
 // 请求路径 映射成 文件系统的路径
 export function requestToFile(root: string, reqPath: string): string{
-  return path.resolve(root, `.${reqPath}`);
+  return path.posix.resolve(root, `.${reqPath}`);
 };
 // importer: 发出import者， importee: 被import者
 export function resolveRelativeRequest(importer: string, importee: string) {
-  return path.resolve(importer, importee);
+  return path.posix.resolve(importer, importee);
 };
+// 抹平window和posix的path差别
+export function normalizePath(url: string) {
+  return path.normalize(url).replace(new RegExp(`${path.sep}${path.sep}`, 'g'), path.posix.sep);
+}

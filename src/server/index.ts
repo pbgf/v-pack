@@ -10,10 +10,9 @@ import moduleRewritePlugin from './plugins/serverModuleRewritePlugin';
 import moduleResolvePlugin from './plugins/serverModuleResolvePlugin';
 import staticPlugin from './plugins/serverStaticPlugin';
 import { cacheRead, readBody } from '../utils/fsUtil';
-import { requestToFile } from '../utils/pathUtil';
-import { error } from 'console';
+import { normalizePath } from '../utils/pathUtil';
 
-const root = process.cwd();
+const root = normalizePath(process.cwd());
 
 const app = new Koa();
 
@@ -84,6 +83,7 @@ export const runServe = () => {
 
     app.use(async (ctx, next) => {
         ctx.read = cacheRead.bind(ctx);
+        ctx.url = normalizePath(ctx.url);
         await next();
     });
 
