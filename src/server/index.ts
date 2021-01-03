@@ -26,7 +26,7 @@ export interface IPlugin {
     transforms?: ITransform | ITransform[];
 }
 
-interface IContext {
+export interface IContext {
     app: Koa;
     root: string;
 }
@@ -82,7 +82,7 @@ export const runServe = () => {
     ];
 
     app.use(async (ctx, next) => {
-        ctx.read = cacheRead.bind(ctx);
+        ctx.read = cacheRead.bind(null, ctx);
         ctx.url = normalizePath(ctx.url);
         await next();
     });

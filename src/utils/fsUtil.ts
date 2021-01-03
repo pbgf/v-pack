@@ -1,14 +1,16 @@
 import fs from 'fs-extra';
 import { Readable } from 'stream'
+import Koa from 'koa';
 
 const fileReadCache = new Map();
 
-export function cacheRead (file: string): Buffer { 
+export function cacheRead (ctx: Koa.ParameterizedContext, file: string): Buffer { 
   if (fileReadCache.has(file)) {
     return fileReadCache.get(file);
   }
   const buf = fs.readFileSync(file);
   fileReadCache.set(file, buf);
+  if (ctx) ctx.body = buf;
   return buf;
 };
 
