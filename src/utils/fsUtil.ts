@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import path from 'path';
 import { Readable } from 'stream'
 import Koa from 'koa';
 
@@ -29,5 +30,18 @@ export async function readBody(
     })
   } else {
     return !stream || typeof stream === 'string' ? stream : stream.toString()
+  }
+}
+
+export function lookupFile(
+  dir: string,
+  formats: string[],
+  pathOnly = false
+): string | undefined {
+  for (const format of formats) {
+    const fullPath = path.join(dir, format)
+    if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+      return pathOnly ? fullPath : fs.readFileSync(fullPath, 'utf-8')
+    }
   }
 }

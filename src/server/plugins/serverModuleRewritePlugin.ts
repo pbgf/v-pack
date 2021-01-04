@@ -2,7 +2,7 @@ import Koa from 'koa';
 import { init, parse } from 'es-module-lexer';
 import MagicString from 'magic-string';
 import { ICorePlugin } from '../';
-import { resolveRelativeRequest, getPrevPath, bareImportRE } from '../../utils/pathUtil';
+import { resolveRelativeRequest, getDirname, bareImportRE } from '../../utils/pathUtil';
 import { readBody } from '../../utils/fsUtil';
 
 const plugin: ICorePlugin = ({ app, root }) => {
@@ -19,7 +19,7 @@ const plugin: ICorePlugin = ({ app, root }) => {
           if (bareImportRE.test(moduleId)) {
             magicStr.overwrite(s, e, `/@modules/${moduleId}`);
           } else {
-            magicStr.overwrite(s, e, resolveRelativeRequest(getPrevPath(root, ctx.url), moduleId));
+            magicStr.overwrite(s, e, resolveRelativeRequest(getDirname(root, ctx.url), moduleId));
           }
         }
         ctx.body = magicStr.toString();

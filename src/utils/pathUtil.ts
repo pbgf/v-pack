@@ -1,4 +1,5 @@
 import path from 'path';
+import resolve from 'resolve';
 import chalk from 'chalk';
 import fs from 'fs';
 
@@ -39,10 +40,18 @@ export function getFullPath(fuzzyPath: string) {
   return '';
 }
 
-export function getPrevPath(root: string, reqUrl: string) {
+export function getDirname(root: string, reqUrl: string) {
   const fullPath = getFullPath(path.posix.join(root, reqUrl)).split(root)[1];
-  return fullPath.slice(0, fullPath.lastIndexOf(path.posix.sep) + 1);
+  return path.posix.dirname(fullPath);
 }
+
+export const resolveFrom = (root: string, id: string) =>
+  resolve.sync(id, {
+    basedir: root,
+    // extensions: supportedExts,
+    // necessary to work with pnpm
+    // preserveSymlinks: isRunningWithYarnPnp || false
+  })
 
 // 请求路径 映射成 文件系统的路径
 export function requestToFile(root: string, reqPath: string): string{
