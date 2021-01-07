@@ -45,14 +45,6 @@ export function getDirname(root: string, reqUrl: string) {
   return path.posix.dirname(fullPath);
 }
 
-export const resolveFrom = (root: string, id: string) =>
-  resolve.sync(id, {
-    basedir: root,
-    // extensions: supportedExts,
-    // necessary to work with pnpm
-    // preserveSymlinks: isRunningWithYarnPnp || false
-  })
-
 // 请求路径 映射成 文件系统的路径
 export function requestToFile(root: string, reqPath: string): string{
   return path.posix.resolve(root, `.${reqPath}`);

@@ -10,9 +10,11 @@
     "koa": "^2.13.0",
     "koa-static": "^5.0.0",
     "magic-string": "^0.25.7",
+    "react": "^17.0.1",
     "resolve": "^1.19.0",
     "rollup": "^2.35.1",
-    "sade": "^1.7.4"
+    "sade": "^1.7.4",
+    "swiper": "^6.4.5"
   },
   "devDependencies": {
     "@types/es-module-lexer": "^0.3.0",

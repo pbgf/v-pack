@@ -60,6 +60,8 @@ function createServerTransformPlugin(plugins: IPlugin[]): ICorePlugin {
                     transform(content || '');
                 }
             });
+            // ctx.type = 'js';
+            // application/octet-stream 待处理
             ctx.body = content;
         });
     };    
@@ -83,6 +85,7 @@ export const runServe = () => {
 
     app.use(async (ctx, next) => {
         ctx.read = cacheRead.bind(null, ctx);
+        ctx.moduleEntryMap = new Map();
         ctx.url = normalizePath(ctx.url);
         await next();
     });

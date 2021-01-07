@@ -1,5 +1,5 @@
 import runServe from './dist/server/index.js';
-import react from 'react';
+import swiper from 'swiper/vue';
 
 let a = {
   b: 'hch',
