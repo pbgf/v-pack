@@ -60,8 +60,6 @@ function createServerTransformPlugin(plugins: IPlugin[]): ICorePlugin {
                     transform(content || '');
                 }
             });
-            // ctx.type = 'js';
-            // application/octet-stream 待处理
             ctx.body = content;
         });
     };    

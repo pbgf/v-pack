@@ -1,7 +1,7 @@
 import { ICorePlugin } from '../';
 import { moduleRE } from '../../utils/pathUtil';
-import { resolveNodeModule } from '../../utils/resolveUtil';
-import fs from 'fs';
+import { resolveNodeModule, mainFields } from '../../utils/resolveUtil';
+import fs from 'fs-extra';
 import path from 'path';
 
 const cacheDir = '.v_cache';
@@ -11,6 +11,7 @@ const plugin: ICorePlugin = ({ app, root }) => {
   fs.mkdirSync(cachePath, { recursive: true });
   app.use(async (ctx, next) => {
     if (moduleRE.test(ctx.path)) {
+      ctx.type = 'js';
       const basename = ctx.path.split('@modules/')[1];
       let fileName;
       // 没有拓展名
@@ -25,6 +26,20 @@ const plugin: ICorePlugin = ({ app, root }) => {
         const { entryPath, releativePath } = resolveNodeModule(root, basename);
         ctx.moduleEntryMap.set(ctx.url, releativePath);
         ctx.read(entryPath);
+      }
+    } 
+    else if (ctx.path.length > 1 && !path.extname(ctx.path)) {
+      // 路径没有后缀 尝试读取文件夹下的package.json
+      const fileName = path.join(root, `${ctx.path}/package.json`);
+      if (fs.existsSync(fileName)) {
+        const pkg = fs.readJSONSync(fileName);
+        mainFields.some(field => {
+          if (pkg[field]) {
+            ctx.read(path.resolve(path.dirname(fileName), pkg[field]));
+            return true;
+          }
+          return false;
+        });
       }
     }
     await next();

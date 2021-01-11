@@ -2,47 +2,60 @@ import path from 'path';
 import resolve from 'resolve';
 import chalk from 'chalk';
 import fs from 'fs';
+import { supportedExts } from './resolveUtil';
 
 //非 . / 开头的模块 都是bareModule
 export const bareImportRE =  /^[^\/\.]/;
 export const moduleRE = /.*@modules.*/;
-export const exts = ['.js', '.jsx'];
+// export const exts = ['.js', '.jsx'];
 
-export function getFullPath(fuzzyPath: string) {
-  const stat = fs.statSync(fuzzyPath);
+/**
+ * 补全完整路径 
+ * /app => /app/index.js
+ * /vue => /vue.js
+ */
+export function patchPath(fuzzyPath: string) {
   let fullPath = fuzzyPath;
   let realExt;
-  if (stat.isDirectory()) {
-    // fs.statSync(fuzzyPath);
-    fullPath = fuzzyPath.endsWith('/') ? fuzzyPath : `${fuzzyPath}/`;
-    const hasFile = exts.some(ext => {
-      const tempStat = fs.statSync(`${fullPath}index${ext}`);
-      realExt = ext;
-      return tempStat.isFile();
-    })
-    if (!hasFile) {
-      console.log(chalk.red(`don't exist file: ${fuzzyPath}`));
-      return '';
+  if (fs.existsSync(fuzzyPath)) {
+    const stat = fs.statSync(fuzzyPath);
+    if (stat.isDirectory()) {
+      // fs.statSync(fuzzyPath);
+      fullPath = fuzzyPath.endsWith('/') ? fuzzyPath : `${fuzzyPath}/`;
+      const hasFile = supportedExts.some(ext => {
+        const possiblePath = `${fullPath}index.${ext}`;
+        if (!fs.existsSync(possiblePath)) return false;
+        const tempStat = fs.statSync(possiblePath);
+        realExt = ext;
+        return tempStat.isFile();
+      })
+      if (!hasFile) {
+        // console.log(chalk.red(`don't exist file: ${fuzzyPath}`));
+        return fuzzyPath;
+      }
+      return `${fullPath}index${realExt}`;
+    } else if (stat.isFile()) {
+      return fullPath;
     }
-    return `${fullPath}index${realExt}`;
-  } else if (stat.isFile()) {
-    return fullPath;
+    return fuzzyPath;
   }
-  const hasFile = exts.some(ext => {
-    const tempStat = fs.statSync(`${fullPath}${ext}`);
+  const hasFile = supportedExts.some(ext => {
+    const possiblePath = `${fullPath}.${ext}`;
+    if (!fs.existsSync(possiblePath)) return false;
+    const tempStat = fs.statSync(possiblePath);
       realExt = ext;
       return tempStat.isFile();
   });
   if (hasFile) {
-    return `${fullPath}${realExt}`;
+    return `${fullPath}.${realExt}`;
   }
   console.log(chalk.red(`don't exist file: ${fuzzyPath}`));
-  return '';
+  return fuzzyPath;
 }
-
-export function getDirname(root: string, reqUrl: string) {
-  const fullPath = getFullPath(path.posix.join(root, reqUrl)).split(root)[1];
-  return path.posix.dirname(fullPath);
+// path.resolve(root, reqUrl)为文件系统中完整的路径
+export function getDirname(reqUrl: string) {
+  // const fullPath = patchPath(path.posix.join(root, reqUrl.replace('@modules', 'node_modules'))).split(root)[1];
+  return path.posix.dirname(reqUrl);
 }
 
 // 请求路径 映射成 文件系统的路径

@@ -29,7 +29,7 @@ export const resolveNodeModule = (root: string, moduleName: string) => {
     });
   }
   return {
-    releativePath: `.${entryPath.split(root)[1]}`.replace('/node_modules', ''),
+    releativePath: entryPath.split(root)[1],
     entryPath,
   };
 };
