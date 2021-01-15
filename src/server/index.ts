@@ -12,7 +12,7 @@ import staticPlugin from './plugins/serverStaticPlugin';
 import { cacheRead, readBody } from '../utils/fsUtil';
 import { normalizePath } from '../utils/pathUtil';
 
-const root = normalizePath(process.cwd());
+export const root = normalizePath(process.cwd());
 
 const app = new Koa();
 
@@ -24,6 +24,18 @@ interface ITransform {
 export interface IPlugin {
     config?: (ctx: IContext) => void | unknown;
     transforms?: ITransform | ITransform[];
+}
+
+export interface IOptimizeDeps {
+    auto: boolean;
+    include: string[];
+    exclude: string[];
+}
+
+export interface IConfig {
+    mode?: string;
+    alias?: Record<string, string>;
+    optimizeDeps?: IOptimizeDeps;
 }
 
 export interface IContext {
@@ -65,7 +77,7 @@ function createServerTransformPlugin(plugins: IPlugin[]): ICorePlugin {
     };    
 };
 
-export const runServe = () => {
+export const runServe = (config: IConfig) => {
     const server = http.createServer(app.callback());
     const context = {
         app,

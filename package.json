@@ -4,29 +4,34 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "chalk": "^4.1.0",
     "es-module-lexer": "^0.3.26",
     "fs-extra": "^9.0.1",
     "koa": "^2.13.0",
     "koa-static": "^5.0.0",
     "magic-string": "^0.25.7",
+    "node-hook": "^1.0.0",
     "react": "^17.0.1",
     "resolve": "^1.19.0",
-    "rollup": "^2.35.1",
+    "rollup": "^2.36.1",
     "sade": "^1.7.4",
-    "swiper": "^6.4.5"
+    "swiper": "^6.4.5",
+    "vue": "^2.6.12"
   },
   "devDependencies": {
     "@types/es-module-lexer": "^0.3.0",
     "@types/fs-extra": "^9.0.6",
     "@types/koa": "^2.11.6",
     "@types/node": "^14.14.16",
+    "@types/node-hook": "^1.0.0",
     "@types/resolve": "^1.17.1",
     "@types/sade": "^1.7.2",
     "typescript": "^4.1.3"
   },
   "scripts": {
     "dev": "node ./dist/cli serve",
+    "vhelp": "node ./dist/cli -h",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

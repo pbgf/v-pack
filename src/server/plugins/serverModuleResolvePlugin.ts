@@ -27,8 +27,7 @@ const plugin: ICorePlugin = ({ app, root }) => {
         ctx.moduleEntryMap.set(ctx.url, releativePath);
         ctx.read(entryPath);
       }
-    } 
-    else if (ctx.path.length > 1 && !path.extname(ctx.path)) {
+    } else if (ctx.path.length > 1 && !path.extname(ctx.path)) {
       // 路径没有后缀 尝试读取文件夹下的package.json
       const fileName = path.join(root, `${ctx.path}/package.json`);
       if (fs.existsSync(fileName)) {

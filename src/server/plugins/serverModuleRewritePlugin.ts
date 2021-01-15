@@ -29,7 +29,6 @@ const plugin: ICorePlugin = ({ app, root }) => {
                 )
               ).split(root)[1]
             );
-            // magicStr.overwrite(s, e, resolveRelativeRequest(getDirname(root, ctx.url), moduleId));
           }
         }
         ctx.body = magicStr.toString();
