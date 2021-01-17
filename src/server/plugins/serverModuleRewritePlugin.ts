@@ -17,10 +17,21 @@ const plugin: ICorePlugin = ({ app, root }) => {
         for(let i = 0;i < imports.length;i++) {
           const { s, e } = imports[i];
           const moduleId = content.slice(s, e);
-          if (bareImportRE.test(moduleId)) {
+          const basePath = moduleId.substring(0, moduleId.indexOf('/'));
+          const aliasKey = Object.keys(ctx.alias || {}).find(key => key === basePath);
+          if (aliasKey) {
+            // 命中了alias
+            const pathWithoutAlias = moduleId.substring(moduleId.indexOf('/'));
+            const fuzzyPath: string = ctx.alias[aliasKey];
+            const resultPath = patchPath(`${fuzzyPath.endsWith('/')
+              ? fuzzyPath.slice(0, -1)
+              : fuzzyPath
+            }${pathWithoutAlias}`);
+            magicStr.overwrite(s, e, resultPath.split(root)[1]);
+          } else if (bareImportRE.test(moduleId)) {
             magicStr.overwrite(s, e, `/@modules/${moduleId}`);
           } else {
-            //ctx.url可能为三方模块，要做特殊处理
+            // ctx.url可能为三方模块，要做特殊处理
             const resolveUrl = ctx.moduleEntryMap.get(ctx.url) || ctx.url;
             magicStr.overwrite(s, e, patchPath(
                 path.posix.join(

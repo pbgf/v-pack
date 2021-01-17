@@ -56,7 +56,3 @@ export function loadConfigFromBundledFile(
   hook.unhook(extension);
   return code
 };
-
-function resolveCOnfig () {
-
-};

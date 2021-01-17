@@ -13,7 +13,10 @@ export function cacheRead (ctx: Koa.ParameterizedContext, file: string): Buffer 
   if (fs.pathExistsSync(file)) {
     const buf = fs.readFileSync(file);
     fileReadCache.set(file, buf);
-    if (ctx) ctx.body = buf;
+    if (ctx) {
+      ctx.type = 'js';
+      ctx.body = buf;
+    }
     return buf;
   }
   // console.log(chalk.red(`don't exist file: ${file}`));

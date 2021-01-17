@@ -11,7 +11,6 @@ const plugin: ICorePlugin = ({ app, root }) => {
   fs.mkdirSync(cachePath, { recursive: true });
   app.use(async (ctx, next) => {
     if (moduleRE.test(ctx.path)) {
-      ctx.type = 'js';
       const basename = ctx.path.split('@modules/')[1];
       let fileName;
       // 没有拓展名

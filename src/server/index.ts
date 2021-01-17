@@ -15,6 +15,9 @@ import { normalizePath } from '../utils/pathUtil';
 export const root = normalizePath(process.cwd());
 
 const app = new Koa();
+const alias: Record<string, string> = {
+    '@': path.resolve(root, './src'),
+};
 
 interface ITransform {
     test: (path: string) => boolean;
@@ -77,6 +80,10 @@ function createServerTransformPlugin(plugins: IPlugin[]): ICorePlugin {
     };    
 };
 
+const responseHandlerPlugin = () => {
+
+};
+
 export const runServe = (config: IConfig) => {
     const server = http.createServer(app.callback());
     const context = {
@@ -92,10 +99,12 @@ export const runServe = (config: IConfig) => {
         createServerTransformPlugin(plugins),
         staticPlugin,
     ];
-
+    const { mode, alias: configAlias = {} } = config;
     app.use(async (ctx, next) => {
         ctx.read = cacheRead.bind(null, ctx);
         ctx.moduleEntryMap = new Map();
+        Object.assign(alias, configAlias);
+        ctx.alias = alias;
         ctx.url = normalizePath(ctx.url);
         await next();
     });
