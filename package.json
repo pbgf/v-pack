@@ -17,7 +17,8 @@
     "rollup": "^2.36.1",
     "sade": "^1.7.4",
     "swiper": "^6.4.5",
-    "vue": "^2.6.12"
+    "vue": "^3.0.5",
+    "ws": "^7.4.1"
   },
   "devDependencies": {
     "@types/es-module-lexer": "^0.3.0",
@@ -27,11 +28,15 @@
     "@types/node-hook": "^1.0.0",
     "@types/resolve": "^1.17.1",
     "@types/sade": "^1.7.2",
+    "@types/ws": "^7.4.0",
+    "chokidar": "^3.5.1",
+    "shelljs": "^0.8.4",
     "typescript": "^4.1.3"
   },
   "scripts": {
     "dev": "node ./dist/cli serve",
     "vhelp": "node ./dist/cli -h",
+    "tsc": "npx tsc && node scripts/index.js && npx tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

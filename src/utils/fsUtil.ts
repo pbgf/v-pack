@@ -8,15 +8,15 @@ const fileReadCache = new Map();
 
 export function cacheRead (ctx: Koa.ParameterizedContext, file: string): Buffer | null { 
   if (fileReadCache.has(file)) {
+    ctx.type = 'js';
+    ctx.body = fileReadCache.get(file);
     return fileReadCache.get(file);
   }
   if (fs.pathExistsSync(file)) {
     const buf = fs.readFileSync(file);
     fileReadCache.set(file, buf);
-    if (ctx) {
-      ctx.type = 'js';
-      ctx.body = buf;
-    }
+    ctx.type = 'js';
+    ctx.body = buf;
     return buf;
   }
   // console.log(chalk.red(`don't exist file: ${file}`));

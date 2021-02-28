@@ -4,10 +4,15 @@ import fs from 'fs-extra';
 import path from 'path';
 import chalk from 'chalk';
 import http from 'http';
+import chokidar, { FSWatcher } from 'chokidar'
 import jsPlugin from './plugins/jsPlugin';
 import transformPlugin from './plugins/serverTransformPlugin';
 import moduleRewritePlugin from './plugins/serverModuleRewritePlugin';
 import moduleResolvePlugin from './plugins/serverModuleResolvePlugin';
+import serverPluginHtml from './plugins/serverPluginHtml';
+import serverPublicPathPlugin from './plugins/serverPublicPathPlugin';
+import serverPluginHmr from './plugins/serverPluginHmr';
+import serverPluginClient from './plugins/serverPluginClient';
 import staticPlugin from './plugins/serverStaticPlugin';
 import { cacheRead, readBody } from '../utils/fsUtil';
 import { normalizePath } from '../utils/pathUtil';
@@ -30,9 +35,9 @@ export interface IPlugin {
 }
 
 export interface IOptimizeDeps {
-    auto: boolean;
-    include: string[];
-    exclude: string[];
+    auto?: boolean; // default false
+    include?: string[];
+    exclude?: string[];
 }
 
 export interface IConfig {
@@ -44,6 +49,10 @@ export interface IConfig {
 export interface IContext {
     app: Koa;
     root: string;
+    port: number;
+    server: http.Server;
+    watcher: FSWatcher;
+    utils: Record<string, unknown>;
 }
 
 export type ICorePlugin = (ctx: IContext) => void;
@@ -86,17 +95,27 @@ const responseHandlerPlugin = () => {
 
 export const runServe = (config: IConfig) => {
     const server = http.createServer(app.callback());
+    const watcher = chokidar.watch(root, {
+        ignored: ['**/node_modules/**', '**/.git/**'],
+        ignoreInitial: true,
+    });
     const context = {
         app,
         root,
         server,
         port: 3000,
+        utils: {},
+        watcher
     };
     const plugins: IPlugin[] = [jsPlugin];
     const corePlugins: ICorePlugin[] = [
+        serverPluginHmr,
+        serverPublicPathPlugin,
         moduleRewritePlugin,
         moduleResolvePlugin,
         createServerTransformPlugin(plugins),
+        serverPluginClient,
+        serverPluginHtml,
         staticPlugin,
     ];
     const { mode, alias: configAlias = {} } = config;
@@ -105,23 +124,26 @@ export const runServe = (config: IConfig) => {
         ctx.moduleEntryMap = new Map();
         Object.assign(alias, configAlias);
         ctx.alias = alias;
+        ctx.server = server;
         ctx.url = normalizePath(ctx.url);
         await next();
     });
-
-    corePlugins.forEach((corePlugin) => {
-        corePlugin(context);
-    });
-    plugins.forEach(plugin => {
-        if(isFunction(plugin?.config)) {
-            plugin?.config(context);
-        }
-    });
+    // 启动server
     server.on('error', (error: Error & { code: string }) => {
         if(error.code === 'EADDRINUSE') {
             server.listen(++context.port);
         }
     })
+    server.on('listening', () => {
+        corePlugins.forEach((corePlugin) => {
+            corePlugin(context);
+        });
+        plugins.forEach(plugin => {
+            if(isFunction(plugin?.config)) {
+                plugin?.config(context);
+            }
+        });
+    });
     server.listen(context.port, () => {
         console.log('Dev server running at:');
         const interfaces = os.networkInterfaces();
