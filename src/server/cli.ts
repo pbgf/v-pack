@@ -4,7 +4,7 @@ import sade from 'sade';
 import path from 'path';
 import fs from 'fs-extra';
 import rollup from './build/rollup';
-import { runServe, root, IConfig } from './server';
+import { runServe, root, IConfig } from '.';
 import { loadConfigFromBundledFile } from './utils/resolveUtil';
 import chalk from 'chalk';
 

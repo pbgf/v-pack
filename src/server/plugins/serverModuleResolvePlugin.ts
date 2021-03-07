@@ -1,6 +1,6 @@
 import { ICorePlugin } from '../';
-import { moduleRE } from '../../utils/pathUtil';
-import { resolveNodeModule, mainFields } from '../../utils/resolveUtil';
+import { moduleRE } from '../utils/pathUtil';
+import { resolveNodeModule, mainFields } from '../utils/resolveUtil';
 import fs from 'fs-extra';
 import path from 'path';
 

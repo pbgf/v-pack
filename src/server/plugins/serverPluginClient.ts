@@ -1,8 +1,8 @@
 import { ICorePlugin } from '../';
-import { injectScriptToHtml } from '../../utils/helpUtil';
-import { readBody } from '../../utils/fsUtil';
+import { injectScriptToHtml } from '../utils/helpUtil';
+import { readBody } from '../utils/fsUtil';
 
-export const clientPath = '/node_modules/vite/client/index.js';
+export const clientPath = '/node_modules/v-pack/client/index.js';
 
 const plugin: ICorePlugin = ({ app, port }) => {
   let clientCode = '';

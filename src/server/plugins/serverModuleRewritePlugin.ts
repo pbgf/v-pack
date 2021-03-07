@@ -3,8 +3,8 @@ import path from 'path';
 import { init, parse } from 'es-module-lexer';
 import MagicString from 'magic-string';
 import { ICorePlugin } from '../';
-import { resolveRelativeRequest, getDirname, bareImportRE, moduleRE, patchPath } from '../../utils/pathUtil';
-import { readBody } from '../../utils/fsUtil';
+import { resolveRelativeRequest, getDirname, bareImportRE, moduleRE, patchPath } from '../utils/pathUtil';
+import { readBody } from '../utils/fsUtil';
 
 const plugin: ICorePlugin = ({ app, root }) => {
     app.use(async (ctx, next) => {

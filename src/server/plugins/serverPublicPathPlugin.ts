@@ -1,6 +1,6 @@
 import { ICorePlugin } from '../';
-import { injectScriptToHtml } from '../../utils/helpUtil';
-import { readBody } from '../../utils/fsUtil';
+import { injectScriptToHtml } from '../utils/helpUtil';
+import { readBody } from '../utils/fsUtil';
 
 const publicPath = '/vite';
 

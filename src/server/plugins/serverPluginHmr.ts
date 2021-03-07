@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { ICorePlugin } from '../';
 
-type updateType = 'full-reload' | 'js-update';
+type updateType = 'full-reload' | 'js-update' | 'style-update';
 export interface IMessage {
   type: updateType;
   path: string;

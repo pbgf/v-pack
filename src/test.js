@@ -1,5 +1,6 @@
 console.log('test');
 
 export default {
-  name: 'test'
+  name: 'test',
+  call: 'call'
 };

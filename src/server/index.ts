@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import http from 'http';
 import chokidar, { FSWatcher } from 'chokidar'
 import jsPlugin from './plugins/jsPlugin';
+import { IMessage } from './plugins/serverPluginHmr';
 import transformPlugin from './plugins/serverTransformPlugin';
 import moduleRewritePlugin from './plugins/serverModuleRewritePlugin';
 import moduleResolvePlugin from './plugins/serverModuleResolvePlugin';
@@ -13,9 +14,10 @@ import serverPluginHtml from './plugins/serverPluginHtml';
 import serverPublicPathPlugin from './plugins/serverPublicPathPlugin';
 import serverPluginHmr from './plugins/serverPluginHmr';
 import serverPluginClient from './plugins/serverPluginClient';
+import serverPluginCss from './plugins/serverPluginCss';
 import staticPlugin from './plugins/serverStaticPlugin';
-import { cacheRead, readBody } from '../utils/fsUtil';
-import { normalizePath } from '../utils/pathUtil';
+import { cacheRead, readBody } from './utils/fsUtil';
+import { normalizePath } from './utils/pathUtil';
 
 export const root = normalizePath(process.cwd());
 
@@ -46,13 +48,17 @@ export interface IConfig {
     optimizeDeps?: IOptimizeDeps;
 }
 
+export interface IUtils {
+    send?: (message: IMessage) => void;
+}
+
 export interface IContext {
     app: Koa;
     root: string;
     port: number;
     server: http.Server;
     watcher: FSWatcher;
-    utils: Record<string, unknown>;
+    utils: IUtils;
 }
 
 export type ICorePlugin = (ctx: IContext) => void;
@@ -116,6 +122,7 @@ export const runServe = (config: IConfig) => {
         createServerTransformPlugin(plugins),
         serverPluginClient,
         serverPluginHtml,
+        serverPluginCss,
         staticPlugin,
     ];
     const { mode, alias: configAlias = {} } = config;

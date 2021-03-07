@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { Readable } from 'stream'
 import Koa from 'koa';
-import chalk from 'chalk';
+// import chalk from 'chalk';
 
 const fileReadCache = new Map();
 
